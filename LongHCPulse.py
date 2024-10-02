@@ -41,7 +41,7 @@ class LongHCPulse:
 
 
 	def _importData(self,rawfile,calfile,sampmass,molarmass,scaleshortpulse, 
-					AdiabaticCriterion):
+					AdiabaticCriterion,useRawTemp=false):
 		# Import thermal conductivity and thermometer resistivity values from calibration file
 		print(" - Importing data...")
 		self.importCalibration(calfile)
@@ -78,16 +78,22 @@ class LongHCPulse:
 					if d[4] == '0':		
 						kk = 1 # If heater power is zero, it's a cooling curve.
 						self.rawdata[j,0,i,kk] = d[0] #time (s)
-						#self.rawdata[j,1,i,kk] = d[3] #Temp (K)  BAD!! UNCORRECTED!!
+						if useRawTemp:
+						    self.rawdata[j,1,i,kk] = d[3] #Temp (K)  BAD!! UNCORRECTED!!
+						else:
+						    self.rawdata[j,1,i,kk] = self._resisToTemp(float(d[2]), self.Bfield[j])
 						self.rawdata[j,2,i,kk] = d[4] #Heater Power (W)
-						self.rawdata[j,1,i,kk] = self._resisToTemp(float(d[2]), self.Bfield[j])
+						
 						i+=1
 					else:	
 						kk = 0  # heating curve.
 						self.rawdata[j,0,ii,kk] = d[0] #time (s)
-						#self.rawdata[j,1,ii,kk] = d[3] #Temp (K) BAD!! UNCORRECTED!!
+						if useRawTemp:
+						    self.rawdata[j,1,ii,kk] = d[3] #Temp (K)  BAD!! UNCORRECTED!!
+						else:
+						    self.rawdata[j,1,ii,kk] = self._resisToTemp(float(d[2]), self.Bfield[j])
 						self.rawdata[j,2,ii,kk] = d[4] #Heater Power (W)
-						self.rawdata[j,1,ii,kk] = self._resisToTemp(float(d[2]), self.Bfield[j])
+						
 
 						#  Attempt to correct heating pulses for improper power values. Didn't work.
 						# Assumes that voltage is measured across heater 
