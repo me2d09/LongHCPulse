@@ -17,7 +17,7 @@ cc = matplotlib.colors.ColorConverter()
 class LongHCPulse:
 	"""For importing long pulse heat capacity data"""
 	def __init__(self,datafile,calfile=None,sampmass=None,molarmass=1,scaleshortpulse=1,
-				AdiabaticCriterion=0.1):
+				AdiabaticCriterion=0.1,useRawTemp=False):
 		# If only rawfile is specified, it assumes that you're feeding it a pickle object
 		print('**************** LongHCPulse v 1.3.3 *****************\n'+\
 			' please cite   https://doi.org/10.1007/s10909-018-2042-9\n'+\
@@ -30,7 +30,7 @@ class LongHCPulse:
 			self._importPickle(**pickdict)
 
 		else: self._importData(datafile,calfile,sampmass,molarmass,scaleshortpulse,
-								AdiabaticCriterion)
+								AdiabaticCriterion,useRawTemp)
 
 
 
@@ -41,7 +41,7 @@ class LongHCPulse:
 
 
 	def _importData(self,rawfile,calfile,sampmass,molarmass,scaleshortpulse, 
-					AdiabaticCriterion,useRawTemp=false):
+					AdiabaticCriterion,useRawTemp):
 		# Import thermal conductivity and thermometer resistivity values from calibration file
 		print(" - Importing data...")
 		self.importCalibration(calfile)
@@ -79,9 +79,9 @@ class LongHCPulse:
 						kk = 1 # If heater power is zero, it's a cooling curve.
 						self.rawdata[j,0,i,kk] = d[0] #time (s)
 						if useRawTemp:
-						    self.rawdata[j,1,i,kk] = d[3] #Temp (K)  BAD!! UNCORRECTED!!
+							self.rawdata[j,1,i,kk] = d[3] #Temp (K)  BAD!! UNCORRECTED!!
 						else:
-						    self.rawdata[j,1,i,kk] = self._resisToTemp(float(d[2]), self.Bfield[j])
+							self.rawdata[j,1,i,kk] = self._resisToTemp(float(d[2]), self.Bfield[j])
 						self.rawdata[j,2,i,kk] = d[4] #Heater Power (W)
 						
 						i+=1
@@ -89,9 +89,9 @@ class LongHCPulse:
 						kk = 0  # heating curve.
 						self.rawdata[j,0,ii,kk] = d[0] #time (s)
 						if useRawTemp:
-						    self.rawdata[j,1,ii,kk] = d[3] #Temp (K)  BAD!! UNCORRECTED!!
+							self.rawdata[j,1,ii,kk] = d[3] #Temp (K)  BAD!! UNCORRECTED!!
 						else:
-						    self.rawdata[j,1,ii,kk] = self._resisToTemp(float(d[2]), self.Bfield[j])
+							self.rawdata[j,1,ii,kk] = self._resisToTemp(float(d[2]), self.Bfield[j])
 						self.rawdata[j,2,ii,kk] = d[4] #Heater Power (W)
 						
 
